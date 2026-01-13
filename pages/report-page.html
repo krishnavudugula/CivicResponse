@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicConnect | New Report</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/report.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo">
+            <i class="fas fa-city"></i>
+            <span>CivicConnect</span>
+        </div> 
+        <ul class="nav-links">
+            <li><a href="#" class="active">Report Issue</a></li>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="#">My Tickets</a></li>
+            <li><a href="#">About Me</a></li>
+        </ul>
+        <a class="btn-dashboard" href="dashboard.html">
+            <i class="fas fa-chart-pie"></i> View Dashboard
+        </a>
+    </header>
+
+    <main class="container">
+        <section class="form-card">
+            <div class="form-header">
+                <h2>Submit a Report</h2>
+                <p>Spotted an issue? Fill out the details below so we can fix it.</p>
+            </div>
+
+            <form id="reportForm" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label>What is the issue?</label>
+                    <input type="text" placeholder="e.g., Deep pothole causing traffic" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <div class="input-wrapper">
+                        <select required>
+                            <option value="">Select Category...</option>
+                            <option value="roads">🛣️ Roads & Infrastructure</option>
+                            <option value="sanitation">🗑️ Sanitation & Waste</option>
+                            <option value="lighting">💡 Street Lighting</option>
+                            <option value="water">💧 Water & Drainage</option>
+                            <option value="traffic">🚦 Traffic & Signals</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="locationInput" placeholder="Enter address or landmark" required>
+                        <button type="button" class="location-btn" onclick="getLocation()">
+                            <i class="fas fa-crosshairs"></i> Detect
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <textarea rows="4" placeholder="Add any extra details regarding the issue..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Evidence</label>
+                    <input type="file" id="fileElem" multiple accept="image/*" style="display:none" onchange="handleFiles(this.files)">
+                    <div class="upload-area" id="drop-area" onclick="document.getElementById('fileElem').click()">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p class="upload-text"><strong>Click to upload</strong> or drag and drop</p>
+                        <p style="font-size: 0.8rem; color: #94a3b8;">SVG, PNG, JPG (MAX. 5MB)</p>
+                    </div>
+                    <div id="preview-container">
+                        <img id="preview-image" src="" alt="Preview">
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Submit Report <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </section>
+
+        <aside class="sidebar">
+            <div class="info-card">
+                <h3 style="color: var(--primary);">
+                    <i class="fas fa-info-circle"></i> Guidelines
+                </h3>
+                <ul class="guideline-list">
+                    <li>Take clear photos from multiple angles.</li>
+                    <li>Ensure the location is accurate (use 'Detect').</li>
+                    <li>Avoid reporting private property issues.</li>
+                    <li>Emergency issues should be called in directly.</li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-chart-bar"></i> Live City Stats</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Total Reports</span>
+                    <span class="stat-val">4,589</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Resolved Today</span>
+                    <span class="stat-val" style="color: var(--success);">+124</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Avg. Response</span>
+                    <span class="stat-val">24 hrs</span>
+                </div>
+            </div>
+        </aside>
+    </main>
+</body>
+</html>
