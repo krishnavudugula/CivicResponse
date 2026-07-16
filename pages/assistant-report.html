@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicConnect AI Assistant</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb;      
+            --primary-dark: #1e40af;
+            --bg-app: #f1f5f9;        
+            --white: #ffffff;
+            --dark: #0f172a;
+            --gray-light: #e2e8f0;
+            --bot-bubble: #f1f5f9;
+            --user-bubble: #2563eb;
+            --user-text: #ffffff;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #cbd5e1; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .chat-widget {
+            width: 100%;
+            max-width: 400px; 
+            height: 80vh;
+            max-height: 800px;
+            background-color: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        .chat-header {
+            background: var(--white);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gray-light);
+            z-index: 10;
+        }
+
+        .header-info { display: flex; align-items: center; gap: 12px; }
+        
+        .bot-avatar-header {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.2rem;
+        }
+
+        .header-text h3 { font-size: 1rem; font-weight: 600; color: var(--dark); }
+        .header-text p { font-size: 0.75rem; color: #10b981; display: flex; align-items: center; gap: 4px; }
+        .header-text p::before { content: ''; width: 6px; height: 6px; background: #10b981; border-radius: 50%; display: inline-block; }
+
+        .refresh-btn {
+            background: none; border: none; color: #94a3b8; cursor: pointer; transition: color 0.2s; font-size: 1rem;
+        }
+        .refresh-btn:hover { color: var(--primary); transform: rotate(180deg); transition: all 0.5s ease; }
+
+        .chat-body {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            scroll-behavior: smooth;
+        }
+        .message-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            opacity: 0;
+            animation: popIn 0.3s forwards;
+        }
+
+        .message-row.user-row { justify-content: flex-end; }
+
+        .bot-avatar-small {
+            width: 28px; height: 28px;
+            background: var(--bg-app); color: var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; flex-shrink: 0;
+        }
+
+        .bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .bot-bubble {
+            background-color: var(--bot-bubble);
+            color: var(--dark);
+            border-bottom-left-radius: 4px;
+        }
+
+        .user-bubble {
+            background-color: var(--user-bubble);
+            color: var(--user-text);
+            border-bottom-right-radius: 4px;
+        }
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-left: 38px; 
+            animation: slideUp 0.4s forwards;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+        .chat-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--gray-light);
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fake-input {
+            flex: 1;
+            background: var(--bg-app);
+            height: 40px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            padding-left: 15px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            cursor: not-allowed;
+        }
+
+        .send-btn {
+            width: 40px; height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            opacity: 0.5; 
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator {
+            display: flex; gap: 4px; padding: 12px 16px;
+            background: var(--bot-bubble);
+            border-radius: 18px; border-bottom-left-radius: 4px;
+            width: fit-content;
+        }
+        .dot {
+            width: 6px; height: 6px; background: #94a3b8; border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="chat-widget">
+        <div class="chat-header">
+            <div class="header-info">
+                <div class="bot-avatar-header"><i class="fas fa-robot"></i></div>
+                <div class="header-text">
+                    <h3>Civic Assistant</h3>
+                    <p>Powered by AI</p>
+                </div>
+            </div>
+            <button class="refresh-btn" onclick="location.reload()" title="Restart Chat">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+
+        <div class="chat-body" id="chat-body">
+            </div>
+
+        <div class="chat-footer">
+            <div class="fake-input">Please select an option...</div>
+            <div class="send-btn"><i class="fas fa-paper-plane"></i></div>
+        </div>
+    </div>
+
+    <script>
+        const conversationTree = {
+            'start': {
+                message: "Hello! I'm the CivicConnect Assistant. I can help you file a report quickly. How can I assist you?",
+                options: [
+                    { text: "Report a civic issue", next_id: 'report_issue' },
+                    { text: "Check status of report", next_id: 'check_report' }
+                ]
+            },
+            'report_issue': {
+                message: "Got it. What type of issue are we dealing with today?",
+                options: [
+                    { text: "🚧 Roads & Potholes", next_id: 'road_issue' },
+                    { text: "🗑️ Sanitation / Garbage", next_id: 'sanitation_issue' },
+                    { text: "💧 Water Supply", next_id: 'water_issue' },
+                    { text: "💡 Street Lights", next_id: 'lighting_issue' }
+                ]
+            },
+            'road_issue': {
+                message: "Understood. Please specify the road problem:",
+                options: [
+                    { text: "Deep Pothole", next_id: 'location_prompt' },
+                    { text: "Damaged Surface", next_id: 'location_prompt' },
+                    { text: "Broken Divider", next_id: 'location_prompt' }
+                ]
+            },
+            'sanitation_issue': {
+                message: "Sanitation is a priority. What exactly is the issue?",
+                options: [
+                    { text: "Overflowing Dustbin", next_id: 'location_prompt' },
+                    { text: "Garbage on Street", next_id: 'location_prompt' },
+                    { text: "Dead Animal", next_id: 'location_prompt' }
+                ]
+            },
+            'location_prompt': {
+                message: "Thanks for the details. To send the team, we need the location.",
+                options: [
+                    { text: "📍 Share Current Location", next_id: 'location_success' },
+                    { text: "⌨️ Type Address Manually", next_id: 'manual_location' }
+                ]
+            },
+            'location_success': {
+                message: "✅ Location received! Your report (Ticket #9921) has been submitted to the local ward office. We will notify you upon resolution.",
+                options: [
+                    { text: "File another report", next_id: 'start' }
+                ]
+            },
+            'manual_location': {
+                message: "Please enter the address below. (Note: Text input simulated for this demo).",
+                options: [
+                    { text: "Submit 'Main Street, Block 4'", next_id: 'location_success' }
+                ]
+            },
+            'check_report': {
+                message: "I can check that. Please provide your Ticket ID.",
+                options: [
+                    { text: "Enter ID: #9921", next_id: 'status_found' },
+                    { text: "I forgot my ID", next_id: 'start' }
+                ]
+            },
+            'status_found': {
+                message: "Ticket #9921 is currently **In Progress**. The maintenance team is scheduled to visit by tomorrow morning.",
+                options: [
+                    { text: "Thanks, that's all", next_id: 'end_chat' },
+                    { text: "Main Menu", next_id: 'start' }
+                ]
+            },
+            'end_chat': {
+                message: "Happy to help! Have a great day.",
+                options: []
+            }
+        };
+
+        const chatBody = document.getElementById('chat-body');
+        function createBotMessage(text) {
+            const row = document.createElement('div');
+            row.className = 'message-row';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'bot-avatar-small';
+            avatar.innerHTML = '<i class="fas fa-robot"></i>';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble bot-bubble';
+            
+            bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+            row.appendChild(avatar);
+            row.appendChild(bubble);
+            return row;
+        }
+        function createUserMessage(text) {
+            const row = document.createElement('div');
+            row.className = 'message-row user-row';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble user-bubble';
+            bubble.textContent = text;
+
+            row.appendChild(bubble);
+            return row;
+        }
+        function showTypingIndicator() {
+            const row = document.createElement('div');
+            row.className = 'message-row typing-row';
+            row.id = 'typing-indicator';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'bot-avatar-small';
+            avatar.innerHTML = '<i class="fas fa-robot"></i>';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'typing-indicator';
+            bubble.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+
+            row.appendChild(avatar);
+            row.appendChild(bubble);
+            chatBody.appendChild(row);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const el = document.getElementById('typing-indicator');
+            if(el) el.remove();
+        }
+
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+        function displayOptions(options) {
+            const container = document.createElement('div');
+            container.className = 'options-grid';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt.text;
+                btn.onclick = () => handleSelection(opt);
+                container.appendChild(btn);
+            });
+            
+            chatBody.appendChild(container);
+            scrollToBottom();
+        }
+        function handleSelection(option) {
+            const oldOptions = document.querySelector('.options-grid');
+            if(oldOptions) oldOptions.remove();
+            chatBody.appendChild(createUserMessage(option.text));
+            scrollToBottom();
+            showTypingIndicator();
+
+            setTimeout(() => {
+                removeTypingIndicator();
+                const step = conversationTree[option.next_id];
+                if(step) {
+                    chatBody.appendChild(createBotMessage(step.message));
+                    if(step.options && step.options.length > 0) {
+                        displayOptions(step.options);
+                    }
+                }
+                scrollToBottom();
+            }, 1000); 
+        }
+        window.onload = function() {
+            chatBody.appendChild(createBotMessage(conversationTree.start.message));
+            setTimeout(() => {
+                displayOptions(conversationTree.start.options);
+            }, 500);
+        };
+    </script>
+</body>
+</html>
