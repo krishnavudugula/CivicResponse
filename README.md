@@ -7,6 +7,7 @@ Civic issue reporting platform - Frontend prototype.
 - Home page with features
 - Report submission form
 - Login Page
+- Dashboard Page
 - Clean UI/UX design
 - Responsive layout
 
