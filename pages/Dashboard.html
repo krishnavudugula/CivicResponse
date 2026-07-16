@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicConnect | Analytics Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page-dashboard">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-city"></i> CivicConnect
+        </div>
+        <ul class="nav-links">
+            <li><a href="#"><i class="fas fa-home"></i> Home Overview</a></li>
+            <li><a href="#" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="#"><i class="fas fa-plus-circle"></i> New Report</a></li>
+            <li><a href="#"><i class="fas fa-map-marked-alt"></i> Issue Map</a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-avatar">JD</div>
+            <div>
+                <p style="font-weight: 600; font-size: 0.9rem;">John Doe</p>
+                <p style="font-size: 0.8rem; color: #94a3b8;">City Admin</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <div class="header-bar">
+            <div class="header-title">
+                <h2>City Overview</h2>
+                <p>Real-time analytics for city maintenance.</p>
+            </div>
+            <button class="date-filter">
+                <i class="far fa-calendar-alt"></i> Last 30 Days
+            </button>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box icon-blue"><i class="fas fa-clipboard-list"></i></div>
+                    <span class="trend up">12%</span>
+                </div>
+                <span class="kpi-value">4,589</span>
+                <span class="kpi-label">Total Reports</span>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box icon-green"><i class="fas fa-check-circle"></i></div>
+                    <span class="trend up">8%</span>
+                </div>
+                <span class="kpi-value">3,124</span>
+                <span class="kpi-label">Resolved</span>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box icon-orange"><i class="fas fa-tools"></i></div>
+                    <span class="trend down">2%</span>
+                </div>
+                <span class="kpi-value">897</span>
+                <span class="kpi-label">In Progress</span>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box icon-red"><i class="fas fa-exclamation-triangle"></i></div>
+                    <span class="trend up">5%</span>
+                </div>
+                <span class="kpi-value">24h</span>
+                <span class="kpi-label">Response Time</span>
+            </div>
+        </div>
+
+        <div class="charts-wrapper">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Reports vs. Resolutions (Weekly)</h3>
+                </div>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="weeklyBarChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Issue Distribution</h3>
+                </div>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="categoryPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-section">
+            <div class="chart-header">
+                <h3>Telangana Region Severity Map</h3>
+                <button class="date-filter" style="padding: 4px 12px; font-size: 0.8rem;">Live View</button>
+            </div>
+            
+            <div class="map-wrapper">
+                <div class="map-container">
+                    <div id="heatmap"></div>
+                </div>
+
+                <div class="map-details">
+                    <div class="legend-item danger">
+                        <div class="legend-title" style="color: var(--danger);">
+                            CRITICAL / DANGER <i class="fas fa-circle-exclamation"></i>
+                        </div>
+                        <div class="legend-desc">Emergency potholes, pipeline bursts, electrical hazards.</div>
+                        <div class="legend-stat">14 Active Zones</div>
+                    </div>
+
+                    <div class="legend-item warning">
+                        <div class="legend-title" style="color: var(--warning);">
+                            LOOK AFTER <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="legend-desc">Street light failures, waste accumulation, minor road damage.</div>
+                        <div class="legend-stat">42 Zones</div>
+                    </div>
+
+                    <div class="legend-item solved">
+                        <div class="legend-title" style="color: var(--success);">
+                            RECENTLY SOLVED <i class="fas fa-check"></i>
+                        </div>
+                        <div class="legend-desc">Areas marked resolved in the last 24hrs.</div>
+                        <div class="legend-stat">28 Zones</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
+
+    <script>
+        // --- 1. BAR CHART CONFIG ---
+        const ctxBar = document.getElementById('weeklyBarChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [
+                    { label: 'New Reports', data: [65, 59, 80, 81, 56, 55, 40], backgroundColor: '#2563eb', borderRadius: 6 },
+                    { label: 'Resolved', data: [45, 49, 60, 70, 46, 45, 30], backgroundColor: '#e2e8f0', borderRadius: 6 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', align: 'end' } },
+                scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
+            }
+        });
+
+        // --- 2. PIE CHART CONFIG ---
+        const ctxPie = document.getElementById('categoryPieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Potholes', 'Sanitation', 'Lighting', 'Noise', 'Other'],
+                datasets: [{
+                    data: [35, 25, 20, 15, 5],
+                    backgroundColor: ['#2563eb', '#3b82f6', '#f59e0b', '#10b981', '#cbd5e1'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: { legend: { position: 'bottom', labels: { usePointStyle: true } } }
+            }
+        });
+
+        // --- 3. TELANGANA HEATMAP CONFIG ---
+        
+        // Center Map on Telangana (approx coordinates)
+        const map = L.map('heatmap').setView([17.7, 79.0], 8); 
+
+        // Light Map Tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        /* DATA POINTS LOGIC:
+           [Lat, Long, Intensity]
+           
+           Intensity 1.0 = RED (Danger/Emergency)
+           Intensity 0.6 = YELLOW (Look After)
+           Intensity 0.3 = GREEN (Recently Solved)
+        */
+        const telanganaPoints = [
+            // --- RED ZONES (Danger) - High Intensity ---
+            [17.3850, 78.4867, 1.0], // Hyderabad Center
+            [17.4000, 78.5000, 0.9], // Hyderabad Secunderabad
+            [17.9689, 79.5941, 1.0], // Warangal (Emergency)
+            [18.4386, 79.1288, 1.0], // Karimnagar (Danger)
+            [17.3660, 78.4760, 1.0], // Charminar area
+            
+            // --- YELLOW ZONES (Look After) - Mid Intensity ---
+            [17.4400, 78.3489, 0.6], // Gachibowli
+            [17.6868, 80.8837, 0.6], // Bhadradri
+            [16.9000, 77.9000, 0.6], // Mahbubnagar outskirts
+            [17.5000, 78.4000, 0.5], // Kukatpally
+            [18.6000, 78.5000, 0.6], // Jagtial area
+
+            // --- GREEN ZONES (Recently Solved) - Low Intensity ---
+            [17.2000, 78.2000, 0.3], // Near Shamshabad
+            [18.1000, 78.8000, 0.3], // Siddipet
+            [17.1000, 79.2000, 0.3], // Nalgonda
+            [19.0000, 79.5000, 0.2], // Adilabad
+            [17.3000, 78.6000, 0.3]  // LB Nagar
+        ];
+
+        L.heatLayer(telanganaPoints, {
+            radius: 25,
+            blur: 15,
+            maxZoom: 10,
+            // GRADIENT MAPPING:
+            // 0.2 -> Green, 0.6 -> Yellow, 1.0 -> Red
+            gradient: {
+                0.2: '#10b981', // Green (Solved)
+                0.6: '#f59e0b', // Yellow (Look After)
+                1.0: '#ef4444'  // Red (Danger)
+            }
+        }).addTo(map);
+
+    </script>
+</body>
+</html>
