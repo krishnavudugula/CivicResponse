@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicConnect | Secure Login</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --dark: #0f172a;
+            --secondary: #64748b;
+            --light: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --error: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            height: 100vh;
+            display: flex;
+            background-color: var(--white);
+            overflow: hidden;
+        }
+        .visual-side {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(15, 23, 42, 0.9)), 
+                        url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2613&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 3rem;
+            color: white;
+            position: relative;
+        }
+
+        .visual-content h1 { font-size: 3.5rem; font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem; }
+        .visual-content p { font-size: 1.2rem; opacity: 0.9; font-weight: 300; max-width: 500px; }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 300px;
+            margin-top: auto;
+        }
+        .stat-box strong { display: block; font-size: 1.5rem; color: #fff; }
+        .stat-box span { font-size: 0.9rem; opacity: 0.8; }
+        .form-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background-color: var(--white);
+            position: relative;
+            overflow-y: auto;
+        }x
+
+        .form-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .logo-mobile { display: none; margin-bottom: 2rem; color: var(--primary); font-size: 1.5rem; font-weight: 700; }
+        .logo-mobile i { margin-right: 8px; }
+
+        .form-header { margin-bottom: 2rem; text-align: center; }
+        .form-header h2 { font-size: 2rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; }
+        .form-header p { color: var(--secondary); }
+        .auth-tabs {
+            display: flex;
+            background: var(--light);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            color: var(--secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab-btn.active { background: var(--white); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .input-group { margin-bottom: 1.25rem; }
+        .input-group label { display: block; font-size: 0.9rem; font-weight: 500; color: var(--dark); margin-bottom: 6px; }
+        
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        
+        input {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s;
+            outline: none;
+        }
+        
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+        .actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .actions a { color: var(--primary); text-decoration: none; font-weight: 500; }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-weight: 500;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: background 0.2s;
+        }
+        .btn-google:hover { background: var(--light); }
+
+        .demo-tag {
+            background: #eff6ff; border: 1px solid #dbeafe; color: var(--primary);
+            padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+            cursor: pointer; margin-left: auto;
+        @media (max-width: 900px) {
+            .visual-side { display: none; }
+            .form-side { padding: 1.5rem; justify-content: flex-start; }
+            .logo-mobile { display: block; }
+            .form-container { margin-top: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="visual-side">
+        <div class="brand">
+            <h3 style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-city"></i> CivicConnect
+            </h3>
+        </div>
+        
+        <div class="visual-content">
+            <h1>Be the change<br>your city needs.</h1>
+            <p>Join the community-led movement to report, track, and resolve civic issues in real-time. Together, let's build a better tomorrow.</p>
+        </div>
+
+        <div class="stat-box">
+            <strong>12,450+</strong>
+            <span>Issues Resolved this Month across Telangana</span>
+        </div>
+    </div>
+
+    <div class="form-side">
+        <div class="logo-mobile">
+            <i class="fas fa-city"></i> CivicConnect
+        </div>
+
+        <div class="form-container">
+            <div class="form-header">
+                <h2 id="form-title">Welcome back</h2>
+                <p id="form-subtitle">Please enter your details to sign in.</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="switchTab('login')" id="tab-login">Login</button>
+                <button class="tab-btn" onclick="switchTab('register')" id="tab-register">Register</button>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <label>Email or Mobile</label>
+                        <span class="demo-tag" onclick="fillDemo()" title="Click to fill test data">Use Demo</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="far fa-envelope"></i>
+                        <input type="text" id="email" placeholder="citizen@example.com or +91..." required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox"> <span style="color:var(--secondary)">Remember me</span>
+                    </label>
+                    <a href="#">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-primary">Sign In</button>
+            </form>
+
+            <form id="register-form" style="display: none;" onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <div class="input-wrapper">
+                        <i class="far fa-user"></i>
+                        <input type="text" placeholder="Enter Name" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Mobile Number</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-mobile-alt"></i>
+                        <input type="tel" placeholder="+91 XXXXXXXX" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="far fa-envelope"></i>
+                        <input type="email" placeholder="you@example.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Create Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" placeholder="Min. 8 characters" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">Create Account</button>
+            </form>
+
+            <button class="btn-google">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20">
+                Continue with Google
+            </button>
+
+            <p style="text-align: center; margin-top: 2rem; font-size: 0.85rem; color: var(--secondary);">
+                By continuing, you agree to our <a href="#" style="color:var(--dark)">Terms of Service</a>.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const title = document.getElementById('form-title');
+            const sub = document.getElementById('form-subtitle');
+            const btnLogin = document.getElementById('tab-login');
+            const btnReg = document.getElementById('tab-register');
+
+            if(tab === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                title.textContent = 'Welcome back';
+                sub.textContent = 'Please enter your details to sign in.';
+                btnLogin.classList.add('active');
+                btnReg.classList.remove('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                title.textContent = 'Join CivicConnect';
+                sub.textContent = 'Start reporting issues in your neighborhood today.';
+                btnLogin.classList.remove('active');
+                btnReg.classList.add('active');
+            }
+        }
+
+        function fillDemo() {
+            document.getElementById('email').value = 'admin@civicconnect.in';
+            document.getElementById('password').value = 'password123';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Verifying...';
+            btn.style.opacity = '0.7';
+
+            setTimeout(() => {
+                window.location.href = 'home.html'; 
+            }, 1000);
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            alert("Registration Successful! Please login.");
+            switchTab('login');
+        }
+    </script>
+</body>
+</html>
